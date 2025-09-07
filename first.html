@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Baitiko - User App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<style>
+
+  
+  :root{
+    --brand:#22457f;
+    --muted:#6b7280;
+    --bg:#fafafa;
+    --card:#fff;
+  }
+  *{box-sizing:border-box}
+
+
+  /* Mobile app viewport simulation */
+body {
+  display: flex;
+  justify-content: center;
+  margin:0;font-family: "Manrope", sans-serif;background:var(--bg);color:#111
+}
+
+#app {
+  width: 420px;              /* fixed mobile width */
+  max-width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  border-radius: 24px;       /* rounded phone corners */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure sticky footer/header stay inside the app container */
+#app nav.tabbar {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+
+
+
+
+  /* header */
+  .app-header{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#fff;color:#000;position:sticky;top:0;z-index:50}
+  .left{display:flex;gap:10px;align-items:center}
+  .logo{background:#fff;color:var(--brand);display:grid;place-content:center;font-weight:800}
+  .logo img{width: 90px;}
+  .address strong{display:block;font-size:14px}
+  .address span{font-size:12px;color:#000}
+  .icon-btn{background:transparent;border:0;color:#000;font-size:22px;padding:8px;cursor:pointer}
+  /* search */
+  .search-wrap {
+    padding: 10px 10px 0px;
+}
+  .search-bar{display:flex;gap:8px;margin:0 auto}
+  .search-wrap input{width:100%;padding:10px;border-radius:10px;border:0}
+  /* pages */
+  .page{display:none;padding:14px 14px 90px;max-width:980px;margin:0 auto}
+  .page.active{display:block}
+  .section{margin:14px 0}
+  h3{margin:0 0 8px}
+  /* slider */
+  .slider{overflow:hidden;border-radius:12px;margin-bottom:20px;background:#eee;margin-top: 0px;}
+  .slides{display:flex;transition:transform .5s ease}
+  .slide{min-width:100%;}
+  /* .slide.big{height:200px} */
+  .images img {height: 150px;width: 100%;}
+  .section h3 {margin-bottom: 20px;}
+/* main{max-width:980px;padding:0 14px 110px} */
+  .slide .text{font-size:18px;font-weight:700}
+  /* services */
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .tile{background:var(--card);padding:14px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:10px;border:1px solid #eee;cursor:pointer}
+  .tile .icon{width:64px;height:64px;border-radius:12px;display:grid;place-content:center;font-size:26px;background:#fff}
+  .tile strong{font-size:13px;text-align:center;font-family: "Manrope", sans-serif;}
+  /* cards */
+  .h-scroll{display:flex;gap:10px;overflow:auto;padding-bottom:6px}
+  .card{min-width:68%;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+  .card .card-body{padding:10px}
+  /* list / rows */
+  .row{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:10px;padding:10px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  .price{font-weight:700}
+  .small{font-size:13px;color:var(--muted)}
+  /* side drawer */
+  .side-drawer{position:fixed;left:-300px;top:0;width:280px;height:100%;background:#fff;box-shadow:2px 0 18px rgba(0,0,0,.12);padding:12px;transition:left .28s;z-index:60}
+  .side-drawer.open{left:0}
+  .close-btn{background:transparent;border:0;font-size:20px;padding:6px;cursor:pointer}
+  .side-drawer nav a{display:block;padding:10px 6px;color:#111;text-decoration:none;border-bottom:1px solid #f0f0f0}
+  /* footer */
+  .tabbar{position:fixed;bottom:0;left:0;right:0;background:#fff;display:grid;grid-template-columns:repeat(4,1fr);padding:8px;border-top:1px solid #eee;z-index:50}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px;border:0;background:transparent;color:var(--muted);font-size:12px;text-decoration:none;cursor:pointer}
+  .tab.active{color:var(--brand);font-weight:700}
+  /* buttons */
+  .btn{padding:10px 12px;border-radius:8px;border:0;cursor:pointer;font-family: "Manrope", sans-serif;}
+  .btn.primary{background:var(--brand);color:#fff}
+  .btn.ghost{background:#f3f3f3;}
+  /* login */
+  .login-wrap{height:100vh;display:grid;place-content:center;padding:20px}
+  .card{background:#fff;padding:12px 25px;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.06)}
+  input[type="text"],input[type="email"],input[type="password"]{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #eee}
+  .muted{color:var(--muted)}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center}
+  /* small helpers */
+  .center{text-align:center}
+  .hidden{display:none}
+  .logo-head img {width: 50px;}
+  .hours-based{display: flex;justify-content: space-between;align-items: center;}
+  @media (min-width:720px){ .grid{grid-template-columns:repeat(2,1fr)} .card{min-width:40%} }
+</style>
+</head>
+<body>
+  <div id="app">
+    <!-- Header (hidden until login) -->
+    <header class="app-header" id="appHeader" style="display:none">
+      <div class="left">
+        <div class="logo-head"><img src="images/logo1.jpg"></div>
+        <!-- <div class="address">
+          <strong id="addrLine">Set your address</strong>
+          <span id="addrSub">Tap to change</span>
+        </div> -->
+      </div>
+      <div>
+        <button id="menuBtn" class="icon-btn" title="Menu">☰</button>
+      </div>
+    </header>
+
+    <!-- Side drawer -->
+    <aside id="drawer" class="side-drawer" aria-hidden="true">
+      <button id="closeDrawer" class="close-btn" aria-label="Close">✕</button>
+      <nav>
+        <a href="#" data-goto="home">Home</a>
+        <a href="#" data-goto="orders">Orders</a>
+        <!-- <a href="#" data-goto="wallet">Wallet</a> -->
+        <a href="#" data-goto="account">Account</a>
+        <a href="#" data-goto="help">Help</a>
+        <a href="#" id="logoutLink">Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Search (hidden until login) -->
+    <section class="search-wrap" id="searchWrap" style="display:none">
+      <div class="search-bar">
+        <input id="search" list="servicesList" type="text" placeholder="Search for 'Cleaning, AC repair'">
+        <datalist id="servicesList"></datalist>
+      </div>
+    </section>
+
+    <!-- Toast -->
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+
+    <!-- Pages -->
+    <main>
+      <!-- LOGIN PAGE -->
+      <section id="page-login" class="page active">
+        <div class="login-wrap">
+          <div class="card" style="max-width:420px;width:100%">
+            <div style="text-align:center;margin-bottom:8px">
+              <div class="logo" style="margin:0 auto"><img src="images/logo1.jpg"></div>
+              <!-- <h2 style="margin:8px 0">Baitiko Demo</h2> -->
+              <p class="muted">Sign in to continue</p>
+            </div>
+
+            <!-- Login form -->
+            <form id="loginForm">
+              <label>Email</label>
+              <input id="loginEmail" type="email" value="demo@demo.com" required>
+              <label>Password</label>
+              <input id="loginPass" type="password" value="1234" required>
+
+              <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+                <button class="btn primary" type="submit">Login</button>
+              </div>
+
+              <div style="margin-top:12px;text-align:center">
+                <a href="#" id="forgotPwd" class="small">Forgot Password?</a> |
+                <a href="#" id="signupLink" class="small">Signup</a>
+              </div>
+
+              <p class="muted small center" style="margin-top:8px">Demo credentials: <strong>demo@demo.com</strong> / <strong>1234</strong></p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- SIGNUP PAGE (modal-like in-page) -->
+      <section id="page-signup" class="page">
+        <div class="card" style="padding:18px;max-width:520px;margin:18px auto;">
+          <h3>Create account</h3>
+          <form id="signupForm">
+            <label>Full name</label>
+            <input id="s_name" type="text" required>
+            <label>Email</label>
+            <input id="s_email" type="email" required>
+            <label>Password</label>
+            <input id="s_pass" type="password" required>
+            <div style="margin-top:12px"><button class="btn primary" type="submit">Create account</button>
+            <button id="backToLogin" class="btn" type="button">Back</button></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- FORGOT PAGE -->
+      <section id="page-forgot" class="page">
+        <div class="card" style="padding:18px;max-width:520px;margin:18px auto;">
+          <h3>Forgot password</h3>
+          <form id="forgotForm">
+            <label>Enter your registered email</label>
+            <input id="f_email" type="email" required>
+            <div style="margin-top:12px"><button class="btn primary" type="submit">Send reset link</button>
+            <button id="backToLogin2" class="btn" type="button">Back</button></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- HOME -->
+      <section id="page-home" class="page">
+        <div class="slider section">
+          <div class="slides" id="slides">
+            <div class="slide big"><div class="images"><img src="images/clean.png"></div></div>
+            <div class="slide big"><div class="images"><img src="images/spaa.png"></div></div>
+            <div class="slide big"><div class="images"><img src="images/paint.png"></div></div>
+          </div>
+        </div>
+
+        <section class="section">
+          <h3>Popular services</h3>
+          <div class="grid" id="serviceGrid"></div>
+        </section>
+
+      </section>
+
+      <!-- SERVICE DETAIL / BIDS / PAYMENT -->
+      <section id="page-service" class="page">
+        <div id="svcContainer"></div>
+      </section>
+
+      <!-- ORDERS -->
+      <section id="page-orders" class="page">
+        <h3>Your Orders</h3>
+        <div id="ordersList"></div>
+      </section>
+
+      <!-- WALLET -->
+      <section id="page-wallet" class="page">
+        <h3>Wallet</h3>
+        <div id="walletBox"></div>
+      </section>
+
+      <!-- ACCOUNT -->
+      <section id="page-account" class="page">
+        <h3>Account</h3>
+        <div id="accountBox"></div>
+      </section>
+
+      <!-- HELP -->
+      <section id="page-help" class="page">
+        <h3>Help & Support</h3>
+        <p class="small">This is a demo. Replace with backend logic for production.</p>
+      </section>
+
+    </main>
+
+    <!-- Footer nav -->
+    <nav class="tabbar" id="footerNav" style="display:none" aria-label="Main navigation">
+      <button class="tab" data-goto="home"><div><img src="images/home.png"></div><div>Home</div></button>
+      <button class="tab" data-goto="account"><div><img src="images/user.png"></div><div>Account</div></button>
+      <button class="tab" data-goto="orders"><div><img src="images/order.png"></div><div>Orders</div></button>
+      <!-- <button class="tab" data-goto="wallet"><div>💰</div><div>Wallet</div></button> -->
+      <button class="tab" data-goto="help"><div><img src="images/help.png"></div><div>Help</div></button>
+    </nav>
+  </div>
+<script>
+/* Demo single-file app script */
+
+/* -------------------------
+   Demo data (services)
+   ------------------------- */
+const demoState = {
+  walletStart: 1200,
+  services: [
+    { id: "cleaning", name: "Cleaning", icon: "images/icons/vacuum.png", items: [
+      { id: "House", name: "House", price: 1999, icon: "images/icons/home.png" },
+      { id: "Car", name: "Car", price: 799, icon: "images/icons/car.png" },
+      { id: "Laundry", name: "Laundry", price: 499, icon: "images/icons/laundry.png" },
+      { id: "Furniture", name: "Furniture", price: 499, icon: "images/icons/sofa.png" },
+      { id: "Carpet", name: "Carpet Cleaning", price: 499, icon: "images/icons/carpet.png" },
+      { id: "Garden", name: "Garden Mowing", price: 499, icon: "images/icons/garden.png" },
+      
+    ]},
+    { id: "maintenance", name: "Maintenance", icon: "images/icons/maintenance.png", items: [
+      { id: "electrician", name: "Electrician", price: 299, icon: "images/icons/electrician.png" },
+      { id: "plumbing", name: "Plumbing", price: 299, icon: "images/icons/plumbing.png" },
+      { id: "mechanical", name: "Car Mechanical", price: 299, icon: "images/icons/car-mechanic.png" },
+      { id: "carpenter", name: "Carpenter", price: 399, icon: "images/icons/carpenter.png" },
+      { id: "painter", name: "Painter", price: 399, icon: "images/icons/painter.png" },
+      { id: "cylinder", name: "Gas cylinder repairing and change", price: 399, icon: "images/icons/gas-cylinder.png" },
+      { id: "bottle", name: "Water bottle delivery", price: 399, icon: "images/icons/water.png" },
+    ]},
+    { id: "personal", name: "Personal Care", icon: "images/icons/personal.png", items: [
+      { id: "child-care", name: "Child Care", price: 699, icon: "images/icons/child-care.png" },
+      { id: "baby-sitter", name: "Baby Sitter", price: 699, icon: "images/icons/baby.png" },
+      { id: "old-people", name: "Old people care", price: 699, icon: "images/icons/elderly.png" },
+      { id: "salon", name: "Salon And Beauty", price: 699, icon: "images/icons/salon.png" },
+      { id: "home-spa", name: "Home Spa", price: 699, icon: "images/icons/home-spa.png" },
+      { id: "makeup", name: "Makeup Artist", price: 699, icon: "images/icons/make-up.png" },
+      { id: "pet-care", name: "Pet Care", price: 699, icon: "images/icons/pet-care.png" },
+      { id: "Medical", name: "Medical Care", price: 699, icon: "images/icons/healthcare.png" },
+    ]},
+    { id: "education", name: "Education and learning", icon: "images/icons/education.png", items: [
+      { id: "driving", name: "Driving Tutor", price: 799, icon: "images/icons/tour-bus.png" },
+      { id: "language", name: "Language Tutor", price: 499, icon: "images/icons/translation.png" },
+      { id: "kinder", name: "Kinder garden teachers", price: 499, icon: "images/icons/classroom.png" },
+      { id: "junior", name: "Junior school teacher", price: 499, icon: "images/icons/classroom.png" },
+      { id: "high", name: "High school teacher", price: 499, icon: "images/icons/student.png" },
+      { id: "course", name: "Online Courses", price: 499, icon: "images/icons/online-course.png" },
+    ]},
+  ]
+};
+
+/* -------------------------
+   Utilities & storage
+   ------------------------- */
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => [...document.querySelectorAll(sel)];
+const toastEl = $('#toast');
+function toast(msg){
+  if(!toastEl) return;
+  toastEl.textContent = msg;
+  toastEl.style.opacity = '1';
+  setTimeout(()=> toastEl.style.opacity = '0', 1400);
+}
+
+const storage = {
+  ordersKey: 'demo_orders_v1',
+  walletKey: 'demo_wallet_v1',
+  userKey: 'demo_user_v1',
+  usersKey: 'demo_users_v1',
+  getOrders(){ return JSON.parse(localStorage.getItem(this.ordersKey) || '[]'); },
+  saveOrders(o){ localStorage.setItem(this.ordersKey, JSON.stringify(o)); },
+  getWallet(){ return Number(localStorage.getItem(this.walletKey) || demoState.walletStart); },
+  saveWallet(v){ localStorage.setItem(this.walletKey, String(v)); },
+  getUser(){ return JSON.parse(localStorage.getItem(this.userKey) || 'null'); },
+  saveUser(u){ localStorage.setItem(this.userKey, JSON.stringify(u)); },
+  removeUser(){ localStorage.removeItem(this.userKey); },
+  getUsers(){ return JSON.parse(localStorage.getItem(this.usersKey) || '[]'); },
+  saveUsers(users){ localStorage.setItem(this.usersKey, JSON.stringify(users)); }
+};
+
+/* Create a default demo user list if not exists */
+(function ensureDemoUser(){
+  const users = storage.getUsers();
+  if(!users.find(u=>u.email==='demo@demo.com')){
+    users.push({name:'Demo User', email:'demo@demo.com', pass:'1234'});
+    storage.saveUsers(users);
+  }
+  if(!localStorage.getItem(storage.walletKey)) localStorage.setItem(storage.walletKey, String(demoState.walletStart));
+})();
+
+/* -------------------------
+   Pages & navigation
+   ------------------------- */
+let pages = {
+  login: $('#page-login'),
+  signup: $('#page-signup'),
+  forgot: $('#page-forgot'),
+  home: $('#page-home'),
+  service: $('#page-service'),
+  orders: $('#page-orders'),
+  wallet: $('#page-wallet'),
+  account: $('#page-account'),
+  help: $('#page-help')
+};
+
+function showPage(name){
+  Object.values(pages).forEach(p=>p.classList.remove('active'));
+  const el = pages[name];
+  if(!el) return;
+  el.classList.add('active');
+  // footer active state
+  $$('.tab').forEach(b=>b.classList.remove('active'));
+  $$('.tab').forEach(b=>{ if(b.dataset.goto === name) b.classList.add('active'); });
+}
+
+/* -------------------------
+   Layout toggle (header/search/footer)
+   ------------------------- */
+function toggleLayout(show){
+  $('#appHeader').style.display = show ? 'flex' : 'none';
+  $('#searchWrap').style.display = show ? 'block' : 'none';
+  $('#footerNav').style.display = show ? 'grid' : 'none';
+}
+
+/* -------------------------
+   Authentication
+   ------------------------- */
+function findUserByEmail(email){
+  return storage.getUsers().find(u=>u.email.toLowerCase() === email.toLowerCase());
+}
+
+function initLogin(){
+  // if already logged in
+  if(storage.getUser()){ showAppHome(); return; }
+  showPage('login');
+  toggleLayout(false);
+
+  $('#loginForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const email = $('#loginEmail').value.trim();
+    const pass = $('#loginPass').value.trim();
+    const users = storage.getUsers();
+    const u = users.find(x=>x.email.toLowerCase() === email.toLowerCase() && x.pass === pass);
+    if(u){
+      storage.saveUser({ email: u.email, name: u.name });
+      // ensure wallet
+      if(!localStorage.getItem(storage.walletKey)) storage.saveWallet(demoState.walletStart);
+      toast('Logged in');
+      showAppHome();
+    } else {
+      toast('Invalid credentials (try demo@demo.com / 1234)');
+    }
+  });
+
+  // forgot/signup links
+  $('#forgotPwd').addEventListener('click', (e)=>{ e.preventDefault(); showPage('forgot'); });
+  $('#signupLink').addEventListener('click', (e)=>{ e.preventDefault(); showPage('signup'); });
+}
+
+/* signup */
+$('#signupForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const name = $('#s_name').value.trim();
+  const email = $('#s_email').value.trim();
+  const pass = $('#s_pass').value.trim();
+  if(!name || !email || !pass){ toast('Fill all fields'); return; }
+  if(findUserByEmail(email)){ toast('Email already registered'); return; }
+  const users = storage.getUsers();
+  users.push({name, email, pass});
+  storage.saveUsers(users);
+  toast('Account created. Please login.');
+  setTimeout(()=> { $('#s_name').value=''; $('#s_email').value=''; $('#s_pass').value=''; showPage('login'); }, 600);
+});
+
+/* back buttons on signup/forgot */
+$('#backToLogin')?.addEventListener('click', ()=> showPage('login'));
+$('#backToLogin2')?.addEventListener('click', ()=> showPage('login'));
+
+/* forgot password */
+$('#forgotForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const email = $('#f_email').value.trim();
+  const u = findUserByEmail(email);
+  if(u){
+    toast('Reset link sent (demo). Check console for password.');
+    console.log('Demo reset: user password ->', u.pass);
+    setTimeout(()=> showPage('login'), 900);
+  } else {
+    toast('Email not found');
+  }
+});
+
+/* logout */
+function doLogout(){
+  storage.removeUser();
+  $('#drawer')?.classList.remove('open');
+  toast('Logged out');
+  toggleLayout(false);
+  setTimeout(()=> showPage('login'), 600);
+}
+
+/* -------------------------
+   Navigation init (drawer + footer)
+   ------------------------- */
+function initNav(){
+  $('#menuBtn').addEventListener('click', ()=> $('#drawer').classList.add('open'));
+  $('#closeDrawer').addEventListener('click', ()=> $('#drawer').classList.remove('open'));
+
+  // drawer links
+  Array.from($('#drawer').querySelectorAll('nav a[data-goto]')).forEach(a=>{
+    a.addEventListener('click', (ev)=>{
+      ev.preventDefault();
+      const goto = a.dataset.goto;
+      $('#drawer').classList.remove('open');
+      routeTo(goto);
+    });
+  });
+
+  $('#logoutLink').addEventListener('click', (ev)=>{
+    ev.preventDefault();
+    doLogout();
+  });
+
+  // footer nav
+  document.querySelectorAll('nav.tabbar .tab').forEach(b=>{
+    b.addEventListener('click', ()=> routeTo(b.dataset.goto) );
+  });
+}
+
+/* routing helper */
+function requireAuthOrShowLogin(){
+  if(!storage.getUser()){
+    showPage('login');
+    toggleLayout(false);
+    return false;
+  }
+  return true;
+}
+
+function routeTo(name){
+  if(name === 'home') { showAppHome(); return; }
+  if(name === 'orders') { if(!requireAuthOrShowLogin()) return; renderOrders(); showPage('orders'); return; }
+  if(name === 'wallet') { if(!requireAuthOrShowLogin()) return; renderWallet(); showPage('wallet'); return; }
+  if(name === 'account') { if(!requireAuthOrShowLogin()) return; renderAccount(); showPage('account'); return; }
+  if(name === 'help') { showPage('help'); return; }
+}
+
+/* -------------------------
+   Home: services + slider + search
+   ------------------------- */
+function showAppHome(){
+  if(!requireAuthOrShowLogin()) return;
+  renderServices();
+  initSearch();
+  initSlider();
+  toggleLayout(true);
+  showPage('home');
+}
+
+function renderServices(){
+  const grid = $('#serviceGrid');
+  grid.innerHTML = '';
+  demoState.services.forEach(cat=>{
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.innerHTML = `
+      <div class="icon">
+        <img src="${cat.icon}" alt="${cat.name}" style="width:40px;height:40px;object-fit:contain">
+      </div>
+      <strong>${cat.name}</strong>`;
+    btn.addEventListener('click', ()=> openService(cat.id));
+    grid.appendChild(btn);
+  });
+}
+
+/* slider autoplay */
+let _sliderInterval = null;
+function initSlider(){
+  const slides = $('#slides');
+  if(!slides) return;
+  if(_sliderInterval) clearInterval(_sliderInterval);
+  let idx = 0;
+  _sliderInterval = setInterval(()=> {
+    idx = (idx + 1) % slides.children.length;
+    slides.style.transform = `translateX(${-idx*100}%)`;
+  }, 3000);
+}
+
+/* search (datalist) */
+function initSearch(){
+  const list = $('#servicesList');
+  if(!list) return;
+  list.innerHTML = '';
+  demoState.services.forEach(cat=>{
+    const opt = document.createElement('option'); opt.value = cat.name; list.appendChild(opt);
+    cat.items.forEach(it=>{
+      const opt2 = document.createElement('option'); opt2.value = `${cat.name} — ${it.name}`; list.appendChild(opt2);
+    });
+  });
+  const input = $('#search');
+  input.value = '';
+  input.onchange = function(){
+    const val = input.value.toLowerCase().trim();
+    const cat = demoState.services.find(c=> val === c.name.toLowerCase() || val.startsWith(c.name.toLowerCase()));
+    if(cat){ openService(cat.id); input.value=''; }
+  };
+}
+
+/* -------------------------
+   Service → bids → payment
+   ------------------------- */
+function openService(catId){
+  const cat = demoState.services.find(s=>s.id === catId);
+  if(!cat) return;
+  if(!requireAuthOrShowLogin()) return;
+  renderServiceDetail(cat);
+  showPage('service');
+  $('#drawer').classList.remove('open');
+}
+
+function renderServiceDetail(cat){
+  const container = $('#svcContainer');
+  container.innerHTML = '';
+  const headerCard = document.createElement('div');
+  headerCard.className = 'card';
+  headerCard.style.padding = '12px';
+  headerCard.innerHTML = `<h3>${cat.name}</h3><div class="small">Choose a service</div><div id="svcItems" style="margin-top:12px"></div>`;
+  container.appendChild(headerCard);
+
+  const svcItems = headerCard.querySelector('#svcItems');
+  cat.items.forEach(it=>{
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.marginBottom = '8px';
+    row.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:center">
+        <img src="${it.icon}" alt="${it.name}" style="width:32px;height:32px;object-fit:contain">
+        <div>
+          <strong>${it.name}</strong>
+        </div>
+      </div>
+      <div><button class="btn primary">Book</button></div>`;
+    svcItems.appendChild(row);
+    row.querySelector('button').addEventListener('click', ()=> showBids(cat, it));
+  });
+}
+
+function showBids(cat, item) {
+  const container = $('#svcContainer');
+  container.innerHTML = `
+    <div class="card" style="padding:12px">
+      <button id="back" class="btn">← Back</button>
+      <h3>Supplier bids for ${item.name}</h3>
+      <label for="bidSelect" class="small">Select a bid option</label>
+      <select id="bidSelect" style="width:100%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #eee">
+      </select>
+      <div style="margin-top:12px">
+        <button id="sendRequest" class="btn primary">Send Request</button>
+      </div>
+    </div>
+  `;
+
+  $('#back').addEventListener('click', () => renderServiceDetail(cat));
+
+  // Example bids
+  const bids = [
+    { name: "1 Hour", price: item.price + 120 },
+    { name: "2 Hours", price: item.price + 40 },
+    { name: "3 Hours", price: item.price + 90 },
+    { name: "4 Hours", price: item.price + 100 },
+    { name: "5 Hours", price: item.price + 120 }
+  ];
+
+  // Fill select dropdown
+  const bidSelect = $('#bidSelect');
+  bids.forEach((b, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${b.name} — ₹${b.price}`;
+    bidSelect.appendChild(opt);
+  });
+
+  // Handle send request
+  $('#sendRequest').addEventListener('click', () => {
+    const chosen = bids[bidSelect.value];
+    if (!chosen) {
+      toast('Please select a bid option');
+      return;
+    }
+    toast(`Request sent for ${item.name} (${chosen.name}, ₹${chosen.price})`);
+    
+    // Store as order
+    const orders = storage.getOrders();
+    const order = {
+      id: 'REQ' + Date.now(),
+      title: item.name,
+      vendor: chosen.name,
+      amount: chosen.price,
+      walletUsed: 0,
+      status: 'Request Sent',
+      when: new Date().toLocaleString()
+    };
+    orders.unshift(order);
+    storage.saveOrders(orders);
+
+    // Go to Orders page after short delay
+    setTimeout(() => routeTo('orders'), 900);
+  });
+}
+
+/* -------------------------
+   Orders / Wallet / Account
+   ------------------------- */
+function renderOrders(){
+  const list = $('#ordersList');
+  const orders = storage.getOrders();
+  list.innerHTML = '';
+  if(orders.length === 0){
+    list.innerHTML = '<div class="card"><p class="small">No orders yet</p></div>';
+    return;
+  }
+  orders.forEach(o=>{
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.style.padding = '10px';
+    el.style.marginTop = '8px';
+    el.innerHTML = `<strong>${o.title}</strong><div class="small">${o.vendor} • ${o.when}</div><div style="margin-top:8px"><span class="price">₹${o.amount}</span> • Wallet used ₹${o.walletUsed}</div>`;
+    list.appendChild(el);
+  });
+}
+
+function renderWallet(){
+  const box = $('#walletBox');
+  const w = storage.getWallet();
+  box.innerHTML = `<div class="card" style="padding:12px"><div class="small">Available balance</div><div style="font-weight:700;margin-top:6px;">₹${w}</div></div>`;
+}
+
+function renderAccount(){
+  const box = $('#accountBox');
+  const user = storage.getUser();
+  box.innerHTML = `<div class="card" style="padding:12px"><div class="small">Logged in as</div><div style="font-weight:700;margin-top:6px">${user?.email||''}</div>
+    <div style="margin-top:12px"><button id="logoutBtn" class="btn">Logout</button></div></div>`;
+  $('#logoutBtn').addEventListener('click', doLogout);
+}
+
+/* -------------------------
+   Boot the app
+   ------------------------- */
+function init(){
+  initNav();
+  initLogin();
+  // wire navigation footer buttons
+  document.querySelectorAll('nav.tabbar .tab').forEach(b=>{
+    b.addEventListener('click', ()=> routeTo(b.dataset.goto) );
+  });
+  // header address click
+  document.querySelector('.address').addEventListener('click', ()=>{
+    const n = prompt('Enter delivery address', $('#addrLine').textContent);
+    if(n){ $('#addrLine').textContent = n; $('#addrSub').textContent = 'Delivering service at'; toast('Address updated'); }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  init();
+  // if user already logged in, show app
+  if(storage.getUser()){
+    showAppHome();
+    renderWallet();
+    renderOrders();
+  }
+});
+
+</script>
+</body>
+</html>

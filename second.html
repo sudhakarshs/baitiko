@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Baitiko - Supplier App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #f6f8fb;
+    --panel: #ffffff;
+    --muted: #6b7280;
+    --brand: #2266a8;
+    --card: #ffffff;
+    --soft: #eef3fb;
+    --accent: #0ea5ff;
+    --danger: #ef5350;
+    --success: #22c55e;
+    --glass: rgba(34,102,168,0.08);
+    --shadow: 0 8px 20px rgba(16,24,40,0.06);
+    font-synthesis: none;
+  }
+  *{box-sizing:border-box}
+  body {
+    display: flex;
+    justify-content: center;
+    margin:0;font-family: "Manrope", sans-serif;background:var(--bg);color:#111
+  }
+  #app {
+    width: 420px;
+    max-width: 100%;
+    min-height: 100vh;
+    background: var(--bg);
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  #app .footer {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  a{color:var(--brand);text-decoration:none}
+  .app-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--panel);position:sticky;top:0;z-index:60;box-shadow:var(--shadow);border-bottom:1px solid #edf2f7}
+  .left{display:flex;gap:12px;align-items:center}
+  .logo{color:#fff;display:grid;place-items:center;font-weight:700}
+  .app-title{font-weight:700;font-size:16px}
+  .menu-btn{background:transparent;border:0;font-size:20px;padding:8px;cursor:pointer;color:var(--brand)}
+  .side-drawer{position:fixed;left:-320px;top:0;width:320px;height:100%;background:#fff;box-shadow:4px 12px 40px rgba(2,6,23,0.08);padding:18px;transition:left .28s;z-index:70}
+  .side-drawer.open{left:0}
+  .navlink{display:block;padding:10px 6px;border-radius:8px;color:#0b1220;border-bottom:1px solid #eef2f7;margin-bottom:8px;background:#fff}
+  .close-drawer{background:transparent;border:0;font-size:18px;cursor:pointer;float:right}
+  .search-wrap{padding:12px 16px;background:transparent}
+  .search-bar{max-width:980px;margin:0 auto;display:flex;gap:8px}
+  .search-bar input{flex:1;padding:12px;border-radius:10px;border:1px solid #e6eef9;background:#fff}
+  .slider{overflow:hidden;border-radius:12px;margin:12px 16px;background:linear-gradient(90deg,#e6f4ff,#ffffff);border:1px solid #e8f0fb}
+  .slides{display:flex;transition:transform .45s ease}
+  .slide{min-width:100%;}
+  .slide h2{margin:0;color:var(--brand)}
+  main{max-width:980px;padding:0 14px 110px}
+  .page{display:none}
+  .page.active{display:block}
+  h3{margin:10px 0 12px}
+  .images img {
+    width: 100%;
+    height: 150px;
+}
+
+  .tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .tab-pill{padding:5px 10px;border-radius:999px;background:var(--card);border:1px solid #eef2f7;cursor:pointer;font-weight:600;color:#374151;box-shadow:var(--shadow);font-size: 14px;}
+  .tab-pill.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .counts{font-weight:700;margin-left:0px}
+  .task-card{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#fff;padding:12px;border-radius:12px;border:1px solid #eef2f7;box-shadow:var(--shadow);margin-bottom:12px;cursor:pointer}
+  .task-left{display:flex;gap:15px;align-items:center;flex:1}
+  .task-ico{border-radius:10px;display:grid;place-items:center;font-weight:700;color:var(--brand)}
+  .task-meta{display:flex;flex-direction:column}
+  .task-title{font-weight:700;font-size:15px}
+  .task-sub{font-size:13px;color:var(--muted)}
+  .task-right{text-align:right;min-width:80px}
+  .task-price{font-weight:800;color:var(--brand)}
+  .task-time{font-size:13px;color:var(--muted)}
+  .small-pill{display:inline-block;padding:6px 8px;border-radius:8px;background:#f3f7fb;border:1px solid #edf4fb;font-size:12px;color:#334155;margin-top:8px}
+  .detail-card{background:#fff;padding:16px;border-radius:12px;border:1px solid #eef2f7;box-shadow:var(--shadow)}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin-bottom:8px}
+  .kv strong{color:#374151}
+  .btn{display:inline-block;padding:10px 12px;border-radius:10px;border:1px solid #e6eef9;background:#fff;cursor:pointer}
+  .btn.primary{background:var(--brand);color:#fff;border:0}
+  .btn.ghost{background:transparent;border:1px solid #e6eef9}
+  .footer{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #eef2f7;padding:8px 10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;box-shadow:0 -6px 20px rgba(2,6,23,0.04)}
+  .footer .fbtn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px;border-radius:8px;color:var(--muted);cursor:pointer}
+  .footer .fbtn.active{color:var(--brand);font-weight:700}
+  .login-wrap{height:100vh;display:grid;place-content:center;padding:20px}
+  .login-card{background:#fff;border-radius:12px;padding:20px;border:1px solid #eef2f7;box-shadow:var(--shadow);width:100%;max-width:420px}
+  input[type="email"],input[type="password"],input[type="text"]{width:100%;padding:12px;border-radius:10px;border:1px solid #eef2f7;margin:8px 0}
+  .muted{color:var(--muted)}
+  .logo img{width: 90px;}
+  .logo-head img {width: 50px;}
+  /* Tabs for profile */
+  .tab-btn{padding:10px 18px;border:0;border-radius:8px;background:var(--card);color:#2266a8;cursor:pointer;font-weight:500;}
+  .tab-btn.active{background:var(--brand);color:#fff;}
+  .tab-pane{padding:12px 0;}
+  /* responsive */
+  @media (max-width:520px){
+    .task-right{min-width:96px}
+    .task-ico{width:56px;height:56}
+    .kv{grid-template-columns:110px 1fr}
+  }
+
+  /* Profile Services neat list */
+.services-list {
+  background: var(--card);
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #eef2f7;
+  box-shadow: var(--shadow);
+}
+.services-list label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* KYC upload styling */
+.kyc-card {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #eef2f7;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.kyc-card h4 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.input-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.input-upload input[type="file"] {
+  display: none;
+}
+.upload-label {
+  padding: 8px 12px;
+  border: 1px solid var(--brand);
+  background: var(--soft);
+  border-radius: 8px;
+  color: var(--brand);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all .2s ease;
+}
+.upload-label:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.services-list ul{margin: 0;}
+.services-list ul li {list-style-type: none;margin-bottom: 5px;font-size: 14px;}
+.services-list input[type="checkbox"] {margin-right: 10px;}
+
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header (hidden until login) -->
+  <header class="app-header" id="appHeader" style="display:none">
+    <div class="left">
+      <div class="logo-head"><img src="images/logo1.jpg"></div>
+      <!-- <div>
+        <div class="app-title">Baitiko</div>
+        <div style="font-size:12px;color:var(--muted)">Delivering at: <strong id="addrLine">Your address</strong></div>
+      </div> -->
+    </div>
+    <div>
+      <button id="menuBtn" class="menu-btn" title="Menu" style="display:none">☰</button>
+    </div>
+  </header>
+
+  <!-- Side drawer -->
+  <aside id="drawer" class="side-drawer" aria-hidden="true">
+    <button class="close-drawer" id="closeDrawer">✕</button>
+    <h3>Menu</h3>
+    <a href="#" class="navlink" data-goto="home">Home</a>
+    <a href="#" class="navlink" data-goto="task">Task</a>
+    <a href="#" class="navlink" data-goto="tasks">All Tasks</a>
+    <a href="#" class="navlink" data-goto="account">Profile</a>
+    <a href="#" class="navlink" data-goto="reviews">Reviews & Ratings</a>
+    <a href="#" class="navlink" data-goto="wallet">Wallet</a>
+    <a href="#" id="logoutLink" class="navlink" style="background:#fff;color:var(--danger);border-color:#fff">Logout</a>
+  </aside>
+
+  <!-- Search & slider (header area) -->
+  <section class="search-wrap" id="searchWrap" style="display:none">
+    <div class="search-bar">
+      <input id="search" placeholder="Search tasks or services (e.g. cleaning, painting)">
+    </div>
+  </section>
+  <div class="slider" id="slider" style="display:none">
+    <div class="slides" id="slides">
+      <div class="slide"><div class="images"><img src="images/spaa.png"></div></div>
+      <div class="slide"><div class="images"><img src="images/spaa.png"></div></div>
+      <div class="slide"><div class="images"><img src="images/paint.png"></div></div>
+    </div>
+  </div>
+
+  <main>
+    <!-- LOGIN PAGE -->
+    <section id="page-login" class="page active">
+      <div class="login-wrap">
+        <div class="login-card">
+          <div style="text-align:center;margin-bottom:8px">
+            <div class="logo" style="margin:0 auto"><img src="images/logo1.jpg"></div>
+            <p class="muted">Sign in to continue</p>
+          </div>
+          <form id="loginForm">
+            <label>Email</label>
+            <input id="loginEmail" type="email" value="demo@demo.com" required>
+            <label>Password</label>
+            <input id="loginPass" type="password" value="1234" required>
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+              <button class="btn primary" type="submit">Login</button>
+            </div>
+            <div style="text-align:center;margin-top:10px">
+              <a href="#" id="forgotPwd" class="muted">Forgot Password?</a> |
+              <a href="#" id="signupLink" class="muted">Signup</a>
+            </div>
+            <p class="muted" style="font-size:13px;text-align:center;margin-top:10px">Demo: <strong>demo@demo.com</strong> / <strong>1234</strong></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIGNUP -->
+    <section id="page-signup" class="page">
+      <div class="login-card">
+        <h3>Create account</h3>
+        <form id="signupForm">
+          <label>Full name</label><input id="s_name" type="text" required>
+          <label>Email</label><input id="s_email" type="email" required>
+          <label>Password</label><input id="s_pass" type="password" required>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn primary" type="submit">Create</button>
+            <button class="btn" id="backToLogin1" type="button">Back</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- FORGOT -->
+    <section id="page-forgot" class="page">
+      <div class="login-card">
+        <h3>Forgot password</h3>
+        <form id="forgotForm">
+          <label>Email</label><input id="f_email" type="email" required>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn primary" type="submit">Send reset link</button>
+            <button class="btn" id="backToLogin2" type="button">Back</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- HOME PAGE (no tabs) -->
+    <section id="page-home" class="page" aria-live="polite">
+      <h3 style="margin-top:6px">Tasks For you</h3>
+      <div id="tasksContainer"></div>
+    </section>
+
+    <!-- TASK PAGE (with tabs) -->
+    <section id="page-task" class="page">
+      <h3 style="margin-top:6px">Tasks</h3>
+      <div class="tabs" id="taskTabs">
+        <div class="tab-pill active" data-filter="all">All Tasks <span class="counts" id="countAll"></span></div>
+        <div class="tab-pill" data-filter="opened">Opened <span class="counts" id="countOpened"></span></div>
+        <!-- <div class="tab-pill" data-filter="assigned">Assigned <span class="counts" id="countAssigned"></span></div> -->
+        <div class="tab-pill" data-filter="completed">Completed <span class="counts" id="countCompleted"></span></div>
+      </div>
+      <div id="tasksContainerTab"></div>
+    </section>
+
+    <!-- TASK DETAIL -->
+    <section id="page-detail" class="page">
+      <button class="btn ghost" onclick="routeTo('home')">← Back</button>
+      <h3>Task details</h3>
+      <div class="detail-card" id="detailCard"></div>
+    </section>
+
+    <!-- PROFILE PAGE WITH TABS -->
+    <section id="page-account" class="page">
+      <h3>Profile</h3>
+      <div style="display:flex;gap:8px;margin-bottom:18px">
+        <button class="tab-btn active" data-tab="account">Account</button>
+        <button class="tab-btn" data-tab="services">Services</button>
+        <button class="tab-btn" data-tab="kyc">KYC</button>
+      </div>
+      <div id="profileAccount" class="tab-pane active">
+        <label>Name</label><input id="profileNameInput" type="text"><br>
+        <label>Email</label><input id="profileEmailInput" type="email"><br>
+        <label>Phone</label><input id="profilePhoneInput" type="text"><br>
+        <label>Address</label><input id="profileAddressInput" type="text"><br>
+        <button class="btn primary" id="profileSaveBtn">Save</button>
+      </div>
+      <!-- SERVICES -->
+      <div id="profileServices" class="tab-pane" style="display:none">
+        <div class="services-list">
+          <label>Cleaning</label>
+          <ul>
+            <li><input type="checkbox" name="service" value="House">House</li>
+            <li><input type="checkbox" name="service" value="Car">Car</li>
+            <li><input type="checkbox" name="service" value="Laundry">Laundry</li>
+            <li><input type="checkbox" name="service" value="Furniture">Furniture</li>
+            <li><input type="checkbox" name="service" value="Carpet Cleaning">Carpet Cleaning</li>
+            <li><input type="checkbox" name="service" value="Garden Mowing">Garden Mowing</li>
+          </ul>
+          <label>Maintenance</label>
+          <ul>
+            <li><input type="checkbox" name="service" value="Electrician">Electrician</li>
+            <li><input type="checkbox" name="service" value="Plumbing">Plumbing</li>
+            <li><input type="checkbox" name="service" value="Car Mechanical">Car Mechanical</li>
+            <li><input type="checkbox" name="service" value="Carpenter">Carpenter</li>
+            <li><input type="checkbox" name="service" value="Painter">Painter</li>
+            <li><input type="checkbox" name="service" value="Gas cylinder repairing and change">Gas cylinder repairing and change</li>
+            <li><input type="checkbox" name="service" value="Water bottle delivery">Water bottle delivery</li>
+          </ul>
+          <label>Personal Care</label>
+          <ul>
+            <li><input type="checkbox" name="service" value="Child Care">Child Care</li>
+            <li><input type="checkbox" name="service" value="Baby Sitter">Baby Sitter</li>
+            <li><input type="checkbox" name="service" value="Old people care">Old people care</li>
+            <li><input type="checkbox" name="service" value="Salon And Beauty">Salon And Beauty</li>
+            <li><input type="checkbox" name="service" value="Home Spa">Home Spa</li>
+            <li><input type="checkbox" name="service" value="Makeup Artist">Makeup Artist</li>
+            <li><input type="checkbox" name="service" value="Pet Care">Pet Care</li>
+            <li><input type="checkbox" name="service" value="Medical Care">Medical Care</li>
+          </ul>
+          <label>Education And Learning</label>
+          <ul>
+            <li><input type="checkbox" name="service" value="Driving Tutor">Driving Tutor</li>
+            <li><input type="checkbox" name="service" value="Language Tutor">Language Tutor</li>
+            <li><input type="checkbox" name="service" value="Kinder garden teachers">Kinder garden teachers</li>
+            <li><input type="checkbox" name="service" value="Junior school teacher">Junior school teacher</li>
+            <li><input type="checkbox" name="service" value="High school teacher">High school teacher</li>
+            <li><input type="checkbox" name="service" value="Online Courses">Online Courses</li>
+          </ul>
+        </div>
+        <button class="btn primary" id="profileServicesSaveBtn" style="margin-top:12px">Save Services</button>
+      </div>
+
+      <!-- KYC -->
+      <div id="profileKyc" class="tab-pane" style="display:none">
+        <div class="kyc-card">
+          <h4>Business Information</h4>
+          <input type="text" placeholder="Business Name" style="margin-bottom:8px;width:100%">
+          <input type="text" placeholder="Registration Number" style="margin-bottom:8px;width:100%">
+        </div>
+        <div class="kyc-card">
+          <h4>Upload Documents</h4>
+          <div class="input-upload">
+            <label class="upload-label" for="kycLicenseUpload">Upload License</label>
+            <input type="file" id="kycLicenseUpload" accept=".pdf,.jpg,.png">
+            <span class="muted" id="kycLicenseName">No file chosen</span>
+          </div>
+          <div class="input-upload">
+            <label class="upload-label" for="kycDrivingUpload">Driving License</label>
+            <input type="file" id="kycDrivingUpload" accept=".pdf,.jpg,.png">
+            <span class="muted" id="kycDrivingName">No file chosen</span>
+          </div>
+        </div>
+        <button class="btn primary" id="profileKycSaveBtn">Save KYC</button>
+      </div>
+    </section>
+
+    <!-- REVIEWS & RATINGS -->
+    <section id="page-reviews" class="page">
+      <h3>Reviews & Ratings</h3>
+      <div style="background:#fff;padding:12px;border-radius:12px;border:1px solid #eef2f7;box-shadow:var(--shadow)">
+        <p class="muted">This is a demo list of reviews.</p>
+        <div style="margin-top:8px"><strong>John D.</strong> — ★★★★☆ <div class="muted" style="font-size:13px">Great service.</div></div>
+        <hr style="margin:10px 0;border:none;border-top:1px solid #f1f5f9">
+        <div><strong>Priya S.</strong> — ★★★★★ <div class="muted" style="font-size:13px">Very professional.</div></div>
+      </div>
+    </section>
+
+    <!-- WALLET -->
+    <section id="page-wallet" class="page">
+      <h3>Wallet</h3>
+      <div style="background:#fff;padding:12px;border-radius:12px;border:1px solid #eef2f7;box-shadow:var(--shadow)">
+        <div class="muted">Available balance</div>
+        <div id="walletAmount" style="font-weight:800;font-size:20px;margin-top:6px">₹0</div>
+        <div style="margin-top:12px">
+          <button class="btn primary" id="addMoneyBtn">Add money</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKFLOW (static) -->
+    <section id="page-workflow" class="page">
+      <h3>Workflow (static)</h3>
+      <div class="flow-wrap" style="margin-top:8px">
+        <div class="flow-box">
+          <h4>Booking will reflect</h4>
+          <p>Booking that user raised will be shown — suppliers will receive request and can bid.</p>
+        </div>
+        <div class="flow-box">
+          <h4>Show quotations</h4>
+          <p>Quotations from suppliers will be displayed to the requester for selection.</p>
+        </div>
+        <div class="flow-box">
+          <h4>User picks quote</h4>
+          <p>User confirms one supplier and proceeds to payment or cash booking.</p>
+        </div>
+        <div class="flow-box">
+          <h4>Payment</h4>
+          <p>Payment Gateway or Cash flow. Demo rule: a small deposit may be withheld from wallet.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <div class="footer" id="footerNav" style="display:none">
+    <div class="fbtn active" data-goto="home"><div>🏠</div><div style="font-size:12px">Home</div></div>
+    <div class="fbtn" data-goto="task"><div>📝</div><div style="font-size:12px">Task</div></div>
+    <div class="fbtn" data-goto="account"><div>👤</div><div style="font-size:12px">Profile</div></div>
+    <div class="fbtn" data-goto="reviews"><div>⭐</div><div style="font-size:12px">Reviews</div></div>
+    <div class="fbtn" data-goto="wallet"><div>💰</div><div style="font-size:12px">Wallet</div></div>
+  </div>
+</div>
+
+
+<script>
+const demoTasks = [
+  { id:'t1', title:'Painting work for 3BHK apartment', price:20, unit:'SAR/hr', location:'Kirkkotie 31', posted:'10s ago', hours:8, offers:21, status:'opened', notes:'Interior wall painting for living room & 3 bedrooms.'},
+  { id:'t2', title:'Clean my apartment within 8 hour shift', price:22, unit:'SAR/hr', location:'Yokyla 21', posted:'13s ago', hours:8, offers:15, status:'opened', notes:'Deep clean: kitchen, bathroom, balcony.'},
+  { id:'t3', title:'Garden cleaning needed', price:15, unit:'SAR/hr', location:'Numminpuisto 6', posted:'15s ago', hours:5, offers:23, status:'assigned', notes:'Mow lawn, trim hedges, collect leaves.'},
+  { id:'t4', title:'AC service & gas top-up', price:30, unit:'SAR/job', location:'Main Street 12', posted:'1m ago', hours:2, offers:6, status:'completed', notes:'AC not cooling well; needs service.'},
+  { id:'t5', title:'Sofa & carpet shampoo', price:12, unit:'SAR/seat', location:'Downtown 9', posted:'2m ago', hours:3, offers:9, status:'opened', notes:'3-seater sofa + large carpet.'},
+];
+
+const $ = (sel, ctx=document) => ctx.querySelector(sel);
+const $$ = (sel, ctx=document) => [].slice.call(ctx.querySelectorAll(sel));
+
+const storage = {
+  userKey:'demo_user_v3',
+  walletKey:'demo_wallet_v3',
+  getUser(){ return JSON.parse(localStorage.getItem(this.userKey)||'null'); },
+  saveUser(u){ localStorage.setItem(this.userKey, JSON.stringify(u)); },
+  removeUser(){ localStorage.removeItem(this.userKey); },
+  getWallet(){ return Number(localStorage.getItem(this.walletKey) || 1200); },
+  saveWallet(v){ localStorage.setItem(this.walletKey, String(v)); }
+};
+
+let tasks = JSON.parse(JSON.stringify(demoTasks));
+let activeTab = 'all';
+
+function toggleLayout(show){
+  $('#appHeader').style.display = show ? 'flex' : 'none';
+  $('#searchWrap').style.display = show ? 'block' : 'none';
+  $('#slider').style.display = show ? 'block' : 'none';
+  $('#footerNav').style.display = show ? 'grid' : 'none';
+  $('#menuBtn').style.display = show ? 'inline-block' : 'none';
+}
+
+function showPage(name){
+  $$('.page').forEach(p=>p.classList.remove('active'));
+  const page = document.getElementById('page-'+name);
+  if(page) page.classList.add('active');
+  $$('.footer .fbtn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.goto === name);
+  });
+}
+
+function initAuth(){
+  const user = storage.getUser();
+  if(user){ postLogin(); return; }
+  toggleLayout(false);
+  showPage('login');
+  $('#loginForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const em = $('#loginEmail').value.trim(), pw = $('#loginPass').value.trim();
+    if(em==='demo@demo.com' && pw==='1234'){
+      storage.saveUser({email:em,name:'Demo User'});
+      storage.saveWallet(1200);
+      postLogin();
+    } else {
+      alert('Invalid credentials. Demo: [demo@demo.com](mailto:demo@demo.com) / 1234');
+    }
+  });
+  $('#signupLink').addEventListener('click', (e)=>{ e.preventDefault(); showPage('signup'); });
+  $('#forgotPwd').addEventListener('click', (e)=>{ e.preventDefault(); showPage('forgot'); });
+  $('#backToLogin1').addEventListener('click', ()=> showPage('login') );
+  $('#backToLogin2').addEventListener('click', ()=> showPage('login') );
+  $('#signupForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    alert('Account created (demo). Please login.');
+    showPage('login');
+  });
+  $('#forgotForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    alert('Reset link sent (demo).');
+    showPage('login');
+  });
+}
+function postLogin(){
+  toggleLayout(true);
+  renderHome();
+  renderFooter();
+  showPage('home');
+  initSlider();
+}
+let sliderIdx = 0, sliderInterval = null;
+function initSlider(){
+  const slides = $('#slides');
+  if(!slides) return;
+  if(sliderInterval) clearInterval(sliderInterval);
+  sliderInterval = setInterval(()=>{
+    sliderIdx = (sliderIdx + 1) % slides.children.length;
+    slides.style.transform = `translateX(${-sliderIdx * 100}%)`;
+  }, 3200);
+}
+function initNav(){
+  $('#menuBtn').addEventListener('click', ()=> $('#drawer').classList.add('open'));
+  $('#closeDrawer').addEventListener('click', ()=> $('#drawer').classList.remove('open'));
+  $('#logoutLink').addEventListener('click', (e)=>{ e.preventDefault(); doLogout(); });
+  $$('.navlink[data-goto]').forEach(a=>{
+    a.addEventListener('click', (ev)=>{
+      ev.preventDefault();
+      const goto = a.dataset.goto;
+      $('#drawer').classList.remove('open');
+      routeTo(goto);
+    });
+  });
+  // footer buttons
+  $$('.footer .fbtn').forEach(b=>{
+    b.addEventListener('click', ()=> routeTo(b.dataset.goto));
+  });
+}
+function routeTo(name){
+  if(!storage.getUser()){ toggleLayout(false); showPage('login'); return; }
+  if(name === 'home'){ renderHome(); showPage('home'); }
+  else if(name === 'task'){ renderTaskPage(); showPage('task'); }
+  else if(name === 'account'){ renderAccountTabs(); showPage('account'); }
+  else if(name === 'reviews'){ showPage('reviews'); }
+  else if(name === 'wallet'){ renderWallet(); showPage('wallet'); }
+  else if(name === 'tasks'){ renderTasksAll(); showPage('home'); }
+  else if(name === 'workflow'){ showPage('workflow'); }
+}
+// Home: no tabs, plain task list
+function renderHome(){
+  renderTasks('all', 'tasksContainer');
+}
+// Task page: tabs and filter
+function renderTaskPage(){
+  renderTaskTabs();
+  renderTasks('all', 'tasksContainerTab');
+}
+function computeCounts(){
+  const all = tasks.length;
+  const opened = tasks.filter(t=>t.status==='opened').length;
+  // const assigned = tasks.filter(t=>t.status==='assigned').length;
+  const completed = tasks.filter(t=>t.status==='completed').length;
+  return {all,opened,completed};
+}
+function renderTaskTabs(){
+  const c = computeCounts();
+  $('#countAll').textContent = `(${c.all})`;
+  $('#countOpened').textContent = `(${c.opened})`;
+  $('#countCompleted').textContent = `(${c.completed})`;
+  // Tab switching
+  $$('#taskTabs .tab-pill').forEach(p=>{
+    p.onclick = ()=>{
+      $$('#taskTabs .tab-pill').forEach(q=>q.classList.remove('active'));
+      p.classList.add('active');
+      renderTasks(p.dataset.filter, 'tasksContainerTab');
+    }
+  });
+}
+function renderTasks(filter = 'all', containerId = 'tasksContainer'){
+  const host = document.getElementById(containerId); host.innerHTML = '';
+  let list = tasks;
+  if(filter === 'opened') list = tasks.filter(t=>t.status==='opened');
+  if(filter === 'completed') list = tasks.filter(t=>t.status==='completed');
+  if(list.length === 0){
+    host.innerHTML = `<div style="padding:18px;background:#fff;border-radius:12px;border:1px solid #eef2f7;box-shadow:var(--shadow)" class="muted">No tasks in this section</div>`;
+    return;
+  }
+  list.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'task-card';
+    card.innerHTML = `
+      <div class="task-left">
+        <div class="task-ico">${t.title.split(' ').slice(0,1)}</div>
+        <div class="task-meta">
+          <div class="task-title">${t.title}</div>
+          <div class="task-sub">${t.location} • ${t.posted}</div>
+          <div class="small-pill">${t.offers} offers • ${t.hours} hrs</div>
+        </div>
+      </div>
+      <div class="task-right">
+        <div class="task-price">${t.price}${t.unit}</div>
+        <div class="task-time">${t.status.toUpperCase()}</div>
+      </div>`;
+    card.addEventListener('click', ()=> openTaskDetail(t.id));
+    host.appendChild(card);
+  });
+}
+function openTaskDetail(id){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  const host = $('#detailCard'); host.innerHTML = '';
+  host.innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+      <div style="width:64px;height:64;border-radius:10px;background:var(--glass);display:grid;place-items:center;font-weight:700;color:var(--brand)">${task.title.split(' ')[0]}</div>
+      <div>
+        <div style="font-weight:800">${task.title}</div>
+        <div class="muted">${task.location} • ${task.posted}</div>
+      </div>
+    </div>
+    <div class="kv"><strong>Price</strong><div>${task.price}${task.unit}</div></div>
+    <div class="kv"><strong>Hours</strong><div>${task.hours} hrs</div></div>
+    <div class="kv"><strong>Offers</strong><div>${task.offers}</div></div>
+    <div class="kv"><strong>Status</strong><div id="detailStatus">${task.status}</div></div>
+    <div style="margin-top:8px;color:var(--muted)">${task.notes}</div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn" id="completeBtn">${task.status==='completed'?'Completed':'Mark Completed'}</button>
+    </div>
+  `;
+
+  $('#completeBtn').onclick = ()=>{
+    updateTaskStatus(task.id, 'completed');
+    $('#detailStatus').textContent = 'completed';
+    $('#completeBtn').textContent = 'Completed';
+    renderTaskTabs(); renderTasks(activeTab, 'tasksContainerTab');
+  };
+  showPage('detail');
+}
+function updateTaskStatus(id, status){
+  const idx = tasks.findIndex(t=>t.id===id);
+  if(idx >= 0){
+    tasks[idx].status = status;
+  }
+}
+function renderTasksAll(){
+  activeTab = 'all';
+  renderTaskTabs();
+  renderTasks('all', 'tasksContainerTab');
+}
+function renderAccountTabs(){
+  // Tabs JS logic
+  $$('.tab-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      $$('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      ['profileAccount','profileServices','profileKyc'].forEach(id=>{
+        const pane = document.getElementById(id);
+        pane.style.display = (id === 'profile'+btn.dataset.tab.charAt(0).toUpperCase()+btn.dataset.tab.slice(1)) ? '' : 'none';
+        pane.classList.toggle('active', id === 'profile'+btn.dataset.tab.charAt(0).toUpperCase()+btn.dataset.tab.slice(1));
+      });
+       $('#profileKycSaveBtn').onclick = function() {
+    alert('KYC Saved! (demo only)');
+  }
+  initKycUploads();
+    };
+  });
+
+// File upload name display
+function initKycUploads() {
+  const licenseInput = $('#kycLicenseUpload');
+  const drivingInput = $('#kycDrivingUpload');
+  const licenseName = $('#kycLicenseName');
+  const drivingName = $('#kycDrivingName');
+
+  if (licenseInput) {
+    licenseInput.addEventListener('change', () => {
+      licenseName.textContent = licenseInput.files.length ? licenseInput.files[0].name : 'No file chosen';
+    });
+  }
+  if (drivingInput) {
+    drivingInput.addEventListener('change', () => {
+      drivingName.textContent = drivingInput.files.length ? drivingInput.files[0].name : 'No file chosen';
+    });
+  }
+}
+
+
+
+  // Account fields filling logic
+  const user = storage.getUser() || {email:'demo@demo.com', name:'Demo User'};
+  $('#profileNameInput').value = user.name || '';
+  $('#profileEmailInput').value = user.email || '';
+  // Save button
+  $('#profileSaveBtn').onclick = function() {
+    const name = $('#profileNameInput').value, email = $('#profileEmailInput').value,
+          phone = $('#profilePhoneInput').value, address = $('#profileAddressInput').value;
+    storage.saveUser({name,email,phone,address});
+    alert('Saved!');
+  }
+  $('#profileServicesSaveBtn').onclick = function() {
+    const services = Array.from(document.querySelectorAll('[name="service"]:checked')).map(cb=>cb.value);
+    alert('Saved Services: '+services.join(', '));
+  }
+  $('#profileKycSaveBtn').onclick = function() {
+    alert('KYC Saved! (demo only)');
+  }
+}
+function renderWallet(){
+  const w = storage.getWallet();
+  $('#walletAmount').textContent = `₹${w}`;
+  $('#addMoneyBtn').onclick = ()=> {
+    const add = Number(prompt('Enter amount to add (demo)', '500')) || 0;
+    storage.saveWallet(w + add);
+    renderWallet();
+    alert('Added ₹' + add);
+  };
+}
+function renderFooter(){
+  $$('.footer .fbtn').forEach(b=> b.classList.toggle('active', b.dataset.goto === 'home'));
+}
+function doLogout(){
+  storage.removeUser();
+  $('#drawer').classList.remove('open');
+  toggleLayout(false);
+  showPage('login');
+}
+function boot(){
+  initAuth();
+  initNav();
+  document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') $('#drawer').classList.remove('open'); });
+}
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
