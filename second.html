@@ -39,6 +39,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    position: relative;
   }
   #app .footer {
     max-width: 420px;
@@ -50,7 +51,7 @@
   .logo{color:#fff;display:grid;place-items:center;font-weight:700}
   .app-title{font-weight:700;font-size:16px}
   .menu-btn{background:transparent;border:0;font-size:20px;padding:8px;cursor:pointer;color:var(--brand)}
-  .side-drawer{position:fixed;left:-320px;top:0;width:320px;height:100%;background:#fff;box-shadow:4px 12px 40px rgba(2,6,23,0.08);padding:18px;transition:left .28s;z-index:70}
+  .side-drawer{position:absolute;left:-320px;top:0;width:320px;height:100%;background:#fff;box-shadow:4px 12px 40px rgba(2,6,23,0.08);padding:18px;transition:left .28s;z-index:70}
   .side-drawer.open{left:0}
   .navlink{display:block;padding:10px 6px;border-radius:8px;color:#0b1220;border-bottom:1px solid #eef2f7;margin-bottom:8px;background:#fff}
   .close-drawer{background:transparent;border:0;font-size:18px;cursor:pointer;float:right}

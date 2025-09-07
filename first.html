@@ -36,6 +36,7 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 /* Ensure sticky footer/header stay inside the app container */
@@ -90,7 +91,7 @@ body {
   .price{font-weight:700}
   .small{font-size:13px;color:var(--muted)}
   /* side drawer */
-  .side-drawer{position:fixed;left:-300px;top:0;width:280px;height:100%;background:#fff;box-shadow:2px 0 18px rgba(0,0,0,.12);padding:12px;transition:left .28s;z-index:60}
+  .side-drawer{position:absolute;left:-300px;top:0;width:280px;height:100%;background:#fff;box-shadow:2px 0 18px rgba(0,0,0,.12);padding:12px;transition:left .28s;z-index:60}
   .side-drawer.open{left:0}
   .close-btn{background:transparent;border:0;font-size:20px;padding:6px;cursor:pointer}
   .side-drawer nav a{display:block;padding:10px 6px;color:#111;text-decoration:none;border-bottom:1px solid #f0f0f0}
