@@ -26,19 +26,63 @@ body {
   margin:0;font-family: "Manrope", sans-serif;background:var(--bg);color:#111
 }
 
+
+
+/* Mobile app viewport */
 #app {
-  width: 420px;              /* fixed mobile width */
-  max-width: 100%;
-  min-height: 100vh;
-  background: var(--bg);
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  border-radius: 24px;       /* rounded phone corners */
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+  position: relative;       /* so splash positions inside this frame */
+  width:420px;
+  max-width:100%;
+  min-height:100vh;
+  background:var(--bg);
+  border-radius:24px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 0 20px rgba(0,0,0,0.2);
 }
 
+/* ---------------------------
+   SPLASH SCREEN LOADER
+----------------------------*/
+/* SPLASH inside app */
+#splash {
+  position:absolute;        /* was fixed */
+  top:0; left:0; right:0; bottom:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(270deg,#22457f,#1e88e5,#42a5f5,#6ec6ff);
+  background-size:600% 600%;
+  animation: gradientFlow 6s ease infinite;
+  z-index:999;              /* just above app content */
+}
+#splash .logo {
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation: pulse 2s infinite;
+  box-shadow:0 0 20px rgba(0,0,0,0.2);
+}
+#splash .logo img {
+  width:80px;
+  height:auto;
+}
+
+@keyframes gradientFlow {
+  0% { background-position:0% 50% }
+  50% { background-position:100% 50% }
+  100% { background-position:0% 50% }
+}
+@keyframes pulse {
+  0% { transform:scale(1) }
+  50% { transform:scale(1.1) }
+  100% { transform:scale(1) }
+}
 /* Ensure sticky footer/header stay inside the app container */
 #app nav.tabbar {
   max-width: 420px;
@@ -119,6 +163,14 @@ body {
 </head>
 <body>
   <div id="app">
+
+    <!-- SPLASH SCREEN -->
+    <div id="splash">
+      <div class="logo">
+        <img src="images/logo1.jpg" alt="Baitiko Logo">
+      </div>
+    </div>
+
     <!-- Header (hidden until login) -->
     <header class="app-header" id="appHeader" style="display:none">
       <div class="left">
@@ -475,6 +527,15 @@ function doLogout(){
   toggleLayout(false);
   setTimeout(()=> showPage('login'), 600);
 }
+
+
+/* Splash screen handling */
+document.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').style.display='none';
+    document.getElementById('app').style.opacity='1';
+  },3000); // 3 sec
+});
 
 /* -------------------------
    Navigation init (drawer + footer)

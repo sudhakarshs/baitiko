@@ -29,18 +29,62 @@
     justify-content: center;
     margin:0;font-family: "Manrope", sans-serif;background:var(--bg);color:#111
   }
-  #app {
-    width: 420px;
-    max-width: 100%;
-    min-height: 100vh;
-    background: var(--bg);
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    border-radius: 24px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
+ /* Mobile app viewport */
+#app {
+  position: relative;       /* so splash positions inside this frame */
+  width:420px;
+  max-width:100%;
+  min-height:100vh;
+  background:var(--bg);
+  border-radius:24px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 0 20px rgba(0,0,0,0.2);
+}
+
+/* ---------------------------
+   SPLASH SCREEN LOADER
+----------------------------*/
+/* SPLASH inside app */
+#splash {
+  position:absolute;        /* was fixed */
+  top:0; left:0; right:0; bottom:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(270deg,#22457f,#1e88e5,#42a5f5,#6ec6ff);
+  background-size:600% 600%;
+  animation: gradientFlow 6s ease infinite;
+  z-index:999;              /* just above app content */
+}
+#splash .logo {
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation: pulse 2s infinite;
+  box-shadow:0 0 20px rgba(0,0,0,0.2);
+}
+#splash .logo img {
+  width:80px;
+  height:auto;
+}
+
+@keyframes gradientFlow {
+  0% { background-position:0% 50% }
+  50% { background-position:100% 50% }
+  100% { background-position:0% 50% }
+}
+@keyframes pulse {
+  0% { transform:scale(1) }
+  50% { transform:scale(1.1) }
+  100% { transform:scale(1) }
+}
+
   #app .footer {
     max-width: 420px;
     margin: 0 auto;
@@ -169,12 +213,23 @@
 .services-list ul{margin: 0;}
 .services-list ul li {list-style-type: none;margin-bottom: 5px;font-size: 14px;}
 .services-list input[type="checkbox"] {margin-right: 10px;}
-
+.small {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: underline;
+}
 
 </style>
 </head>
 <body>
 <div id="app">
+
+  <!-- SPLASH SCREEN -->
+  <div id="splash">
+    <div class="logo">
+      <img src="images/logo1.jpg" alt="Baitiko Logo">
+    </div>
+  </div>
 
   <!-- Header (hidden until login) -->
   <header class="app-header" id="appHeader" style="display:none">
@@ -235,8 +290,8 @@
               <button class="btn primary" type="submit">Login</button>
             </div>
             <div style="text-align:center;margin-top:10px">
-              <a href="#" id="forgotPwd" class="muted">Forgot Password?</a> |
-              <a href="#" id="signupLink" class="muted">Signup</a>
+              <a href="#" id="forgotPwd" class="muted small">Forgot Password?</a> |
+              <a href="#" id="signupLink" class="muted small">Signup</a>
             </div>
             <p class="muted" style="font-size:13px;text-align:center;margin-top:10px">Demo: <strong>demo@demo.com</strong> / <strong>1234</strong></p>
           </form>
@@ -736,6 +791,16 @@ function doLogout(){
   toggleLayout(false);
   showPage('login');
 }
+
+/* Splash screen handling */
+document.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').style.display='none';
+    document.getElementById('app').style.opacity='1';
+  },3000); // 3 sec
+});
+
+
 function boot(){
   initAuth();
   initNav();
