@@ -300,6 +300,23 @@ body {
         <h3>Your Orders</h3>
         <div id="ordersList"></div>
       </section>
+    <!-- ORDER DETAIL / BIDS -->
+    <section id="page-order-detail" class="page">
+      <div class="card" style="padding:12px;margin:12px">
+        <button class="btn" id="backToOrders">← Back</button>
+        <h3>Request details</h3>
+        <div id="orderDetailBox"></div>
+      </div>
+    </section>
+
+    <!-- PAYMENT PAGE -->
+    <section id="page-payment" class="page">
+      <div class="card" style="padding:12px;margin:12px" id="paymentCard">
+        <h3>Payment</h3>
+        <div id="paymentBox"></div>
+      </div>
+    </section>
+
 
       <!-- WALLET -->
       <section id="page-wallet" class="page">
@@ -530,6 +547,14 @@ function doLogout(){
 
 
 /* Splash screen handling */
+
+// Clear existing demo orders once at app start, so list is empty initially
+document.addEventListener('DOMContentLoaded', ()=>{
+  try {
+    localStorage.setItem('demo_orders_v1', '[]');
+  } catch(e){}
+});
+
 document.addEventListener('DOMContentLoaded', ()=>{
   setTimeout(()=>{
     document.getElementById('splash').style.display='none';
@@ -808,6 +833,169 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
 });
 
+
+/* ---- Added: Order detail, bid accept, payment flow (shared via localStorage 'demo_orders_v1') ---- */
+// ensure new pages are accessible via pages map
+pages.orderDetail = document.getElementById('page-order-detail');
+pages.payment = document.getElementById('page-payment');
+
+// Globals for selection
+window._currentOrderId = null;
+window._currentBidId = null;
+
+function openOrderDetail(orderId){
+  const orders = storage.getOrders();
+  const order = orders.find(o=> o.id === orderId);
+  if(!order){
+    toast('Order not found');
+    return;
+  }
+  _currentOrderId = orderId;
+  const box = document.getElementById('orderDetailBox');
+  box.innerHTML = '';
+  const html = document.createElement('div');
+  html.innerHTML = `
+    <div style="padding:8px;background:#fff;border-radius:10px">
+      <div><strong>${order.title}</strong></div>
+      <div class="small">Requested: ${order.when}</div>
+      <div style="margin-top:8px">Selected option: <strong>${order.vendor}</strong></div>
+      <div style="margin-top:8px">Amount: <span class="price">₹${order.amount}</span></div>
+      <div style="margin-top:12px"><strong>Bids</strong></div>
+      <div id="bidsList" style="margin-top:8px"></div>
+    </div>
+  `;
+  box.appendChild(html);
+
+  const bidsList = box.querySelector('#bidsList');
+  const bids = order.bids || [];
+  if(bids.length === 0){
+    bidsList.innerHTML = '<div class="small muted">No bids received yet. Suppliers will bid here.</div>';
+  } else {
+    bids.forEach(b=>{
+      const div = document.createElement('div');
+      div.style.padding = '8px'; div.style.marginTop='8px'; div.style.background='#fafafa'; div.style.borderRadius='8px';
+      div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>${b.supplierName||b.supplierEmail||'Supplier'}</strong><div class="small">${b.message||''}</div></div>
+        <div style="text-align:right"><div class="price">₹${b.amount}</div><div class="small">${b.when||''}</div></div>
+      </div>`;
+      const accept = document.createElement('button');
+      accept.className = 'btn primary'; accept.style.marginTop='8px';
+      accept.textContent = 'Accept & Pay';
+      accept.onclick = ()=> goToPayment(order.id, b.id);
+      div.appendChild(accept);
+      bidsList.appendChild(div);
+    });
+  }
+  // Back button
+  document.getElementById('backToOrders').onclick = ()=> routeTo('orders');
+  // show page
+  showPage('orderDetail');
+}
+
+function goToPayment(orderId, bidId){
+  const orders = storage.getOrders();
+  const order = orders.find(o=>o.id === orderId);
+  if(!order) return toast('Order not found');
+  const bid = (order.bids||[]).find(b=>b.id === bidId);
+  if(!bid) return toast('Bid not found');
+  window._currentOrderId = orderId;
+  window._currentBidId = bidId;
+  renderPaymentPage(order, bid);
+  showPage('payment');
+}
+
+
+function renderPaymentPage(order, bid){
+  const box = document.getElementById('paymentBox');
+  box.innerHTML = '';
+  const wrap = document.createElement('div');
+  if(order.status === 'booked'){
+    wrap.innerHTML = `
+      <div><strong>${order.title}</strong></div>
+      <div class="small">Provider: ${order.assigned?.supplierName||order.assigned?.supplierEmail}</div>
+      <div style="margin-top:8px">Amount: <strong>₹${order.assigned?.amount}</strong></div>
+      <div style="margin-top:12px;color:green;font-weight:bold">Booking already confirmed</div>
+    `;
+  } else {
+    wrap.innerHTML = `
+      <div><strong>${order.title}</strong></div>
+      <div class="small">Provider: ${bid.supplierName||bid.supplierEmail}</div>
+      <div style="margin-top:8px">Amount: <strong>₹${bid.amount}</strong></div>
+      <div style="margin-top:12px">
+        <label><input type="radio" name="payMethod" value="card" checked> Card</label>
+        <label style="margin-left:12px"><input type="radio" name="payMethod" value="cash"> Cash</label>
+      </div>
+      <div style="margin-top:12px">
+        <button id="confirmPayBtn" class="btn primary">Confirm & Book</button>
+      </div>
+    `;
+    box.appendChild(wrap);
+    document.getElementById('confirmPayBtn').onclick = ()=> confirmPayment();
+  }
+  box.appendChild(wrap);
+}
+
+function confirmPayment(){
+  const orders = storage.getOrders();
+  const order = orders.find(o=>o.id === window._currentOrderId);
+  if(!order) return toast('Order not found');
+  const bid = (order.bids||[]).find(b=>b.id === window._currentBidId);
+  if(!bid) return toast('Bid not found');
+  // payment method
+  const pm = document.querySelector('input[name="payMethod"]:checked')?.value || 'card';
+  order.status = 'booked';
+  order.assigned = bid;
+  order.paymentMethod = pm;
+  order.bookedWhen = new Date().toLocaleString();
+  storage.saveOrders(orders);
+  toast('Payment confirmed — booking done');
+  // go back to orders list
+  setTimeout(()=> { routeTo('orders'); renderOrders(); }, 900);
+}
+
+// Make orders clickable from Orders page
+function renderOrders(){
+  const list = $('#ordersList');
+  const orders = storage.getOrders();
+  list.innerHTML = '';
+  if(orders.length === 0){
+    list.innerHTML = '<div class="card"><p class="small">No orders yet</p></div>';
+    return;
+  }
+  orders.forEach(o=>{
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.style.padding = '10px';
+    el.style.marginTop = '8px';
+    let assignedText = '';
+    if(o.status === 'booked') assignedText = `<div class="small">Assigned to: ${o.assigned?.supplierName||o.assigned?.supplierEmail||''} • ${o.bookedWhen||''}</div>`;
+    el.innerHTML = `<strong>${o.title}</strong><div class="small">${o.vendor} • ${o.when}</div>${assignedText}<div style="margin-top:8px"><span class="price">₹${o.amount}</span> • Wallet used ₹${o.walletUsed || 0}</div>`;
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'btn'; viewBtn.style.marginTop='8px';
+    viewBtn.textContent = 'View';
+    viewBtn.onclick = ()=> openOrderDetail(o.id);
+    el.appendChild(viewBtn);
+    list.appendChild(el);
+  });
+}
+
+// Ensure Orders view is up-to-date after initialization
+document.addEventListener('DOMContentLoaded', ()=>{
+  // re-map pages in case DOM added late
+  pages.orderDetail = document.getElementById('page-order-detail');
+  pages.payment = document.getElementById('page-payment');
+});
+/* ---- End added code ---- */
 </script>
+
+<!-- Booking Confirmation Popup -->
+<div id="bookingPopup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:#fff;padding:20px;border-radius:12px;max-width:320px;text-align:center">
+    <h3>Booking Confirmed</h3>
+    <p>Your booking has been successfully done.</p>
+    <button id="popupOkBtn" class="btn primary">OK</button>
+  </div>
+</div>
+
 </body>
 </html>

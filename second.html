@@ -793,6 +793,13 @@ function doLogout(){
 }
 
 /* Splash screen handling */
+
+// Clear existing demo orders once at app start, so list is empty initially
+document.addEventListener('DOMContentLoaded', ()=>{
+  try {
+  } catch(e){}
+});
+
 document.addEventListener('DOMContentLoaded', ()=>{
   setTimeout(()=>{
     document.getElementById('splash').style.display='none';
@@ -807,6 +814,153 @@ function boot(){
   document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') $('#drawer').classList.remove('open'); });
 }
 document.addEventListener('DOMContentLoaded', boot);
+
+/* ---- Added: Sync incoming user requests from localStorage 'demo_orders_v1' and enable supplier bids ---- */
+const SHARED_ORDERS_KEY = 'demo_orders_v1';
+
+function getSharedOrders(){
+  try{
+    return JSON.parse(localStorage.getItem(SHARED_ORDERS_KEY) || '[]');
+  }catch(e){ return []; }
+}
+
+function saveSharedOrders(arr){
+  localStorage.setItem(SHARED_ORDERS_KEY, JSON.stringify(arr));
+}
+
+// Convert shared orders into supplier 'tasks' view and replace tasks list (remove demoTasks per request)
+
+function syncTasksFromOrders(){
+  const orders = getSharedOrders();
+  tasks = orders.map(o => {
+    let status = 'opened';
+    if(o.status === 'booked') status = 'completed'; // show as completed once payment done
+    if(o.status === 'completed') status = 'completed';
+    return {
+      id: o.id,
+      title: o.title,
+      price: o.amount || 0,
+      unit: '',
+      location: o.when || 'User Request',
+      posted: o.when || 'now',
+      hours: o.hours || 1,
+      offers: (o.bids || []).length,
+      status: status,
+      notes: o.notes || 'Request from user'
+    };
+  });
+}
+
+
+// Override renderHome and renderTaskPage to sync first
+const _origRenderHome = renderHome;
+renderHome = function(){
+  syncTasksFromOrders();
+  // now render tasks as usual using updated tasks variable
+  renderTasks('all', 'tasksContainer');
+}
+
+const _origRenderTaskPage = renderTaskPage;
+renderTaskPage = function(){
+  syncTasksFromOrders();
+  renderTaskTabs();
+  renderTasks('all', 'tasksContainerTab');
+}
+
+// When opening task detail, if it's an order, show bids and a 'Place Bid' form
+const _origOpenTaskDetail = openTaskDetail;
+openTaskDetail = function(id){
+  // check if shared order exists with this id
+  const orders = getSharedOrders();
+  const ord = orders.find(o=>o.id === id);
+  if(ord){
+    // render order-specific detail with bid form
+    const host = $('#detailCard'); host.innerHTML = '';
+    host.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+        <div style="width:64px;height:64;border-radius:10px;background:var(--glass);display:grid;place-items:center;font-weight:700;color:var(--brand)">${ord.title.split(' ')[0]}</div>
+        <div>
+          <div style="font-weight:800">${ord.title}</div>
+          <div class="muted">${ord.location || ''} • ${ord.posted || ''}</div>
+        </div>
+      </div>
+      <div class="kv"><strong>Selected Option</strong><div>${ord.vendor || ''}</div></div>
+      <div class="kv"><strong>Amount</strong><div>₹${ord.amount || 0}</div></div>
+      <div class="kv"><strong>Status</strong><div id="detailStatus">${ord.status || 'requested'}</div></div>
+      <div style="margin-top:8px;color:var(--muted)">${ord.notes || ''}</div>
+      <div style="margin-top:12px"><strong>Bids</strong><div id="supplierBidsList" style="margin-top:8px"></div></div>
+      <div style="margin-top:12px" id="placeBidBox">
+        <h4>Place your bid</h4>
+        <label>Amount (₹)</label><input id="bidAmountInput" type="number" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee;margin-top:6px">
+        <label style="margin-top:8px">Message</label><textarea id="bidMessageInput" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eee;margin-top:6px"></textarea>
+        <div style="margin-top:8px"><button id="placeBidBtn" class="btn primary">Send Bid</button></div>
+      </div>
+    `;
+    // populate existing bids
+    const bidsList = $('#supplierBidsList');
+    (ord.bids || []).forEach(b=>{
+      const d = document.createElement('div');
+      d.style.padding='8px'; d.style.marginTop='8px'; d.style.background='#fafafa'; d.style.borderRadius='8px';
+      d.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${b.supplierName||b.supplierEmail}</strong><div class="small">${b.message||''}</div></div><div class="price">₹${b.amount}</div></div>`;
+      bidsList.appendChild(d);
+    });
+    // place bid handler
+    $('#placeBidBtn').onclick = ()=>{
+      const amt = Number($('#bidAmountInput').value) || 0;
+      const msg = $('#bidMessageInput').value || '';
+      if(!amt){ alert('Enter bid amount'); return; }
+      const user = storage.getUser() || {email:'supplier@demo.com', name:'Demo Supplier'};
+      const newBid = { id: 'BID'+Date.now(), supplierEmail: user.email, supplierName: user.name, amount: amt, message: msg, when: new Date().toLocaleString() };
+      ord.bids = ord.bids || [];
+      ord.bids.push(newBid);
+      // save back to shared orders
+      const all = getSharedOrders();
+      const idx = all.findIndex(x=>x.id===ord.id);
+      if(idx>=0){ all[idx] = ord; saveSharedOrders(all); syncTasksFromOrders(); renderTaskTabs(); renderTasks(activeTab, 'tasksContainerTab'); alert('Bid sent'); }
+      else alert('Failed to send bid');
+      // refresh bids list in UI
+      openTaskDetail(ord.id);
+    };
+    // if assigned, show Complete button
+    if(ord.status === 'booked'){
+      const completeBtn = document.createElement('button');
+      completeBtn.className = 'btn'; completeBtn.textContent = 'Mark Completed';
+      completeBtn.onclick = ()=> {
+        const all = getSharedOrders();
+        const idx = all.findIndex(x=>x.id===ord.id);
+        if(idx>=0){ all[idx].status = 'completed'; saveSharedOrders(all); alert('Marked completed'); syncTasksFromOrders(); renderTaskTabs(); renderTasks(activeTab, 'tasksContainerTab'); showPage('task'); }
+      };
+      $('#placeBidBox').appendChild(completeBtn);
+    }
+    showPage('detail');
+    return;
+  }
+  // fallback to original behaviour for non-shared tasks
+  _origOpenTaskDetail(id);
+}
+/* ---- End added supplier code ---- */
+
+// Extend syncTasksFromOrders to mark booked as done in Orders tab
+function renderOrdersTab(){
+  const orders = getSharedOrders();
+  const container = document.getElementById('ordersContainer');
+  if(!container) return;
+  container.innerHTML = '';
+  if(orders.length === 0){ container.innerHTML = '<div class="card"><p class="small">No bookings yet</p></div>'; return; }
+  orders.forEach(o=>{
+    if(o.status==='booked' || o.status==='completed'){
+      const div = document.createElement('div');
+      div.className='card'; div.style.padding='10px'; div.style.marginTop='8px';
+      div.innerHTML = `<strong>${o.title}</strong><div class="small">Assigned: ${o.assigned?.supplierName||o.assigned?.supplierEmail||''}</div><div class="small">Status: ${o.status}</div>`;
+      container.appendChild(div);
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(document.getElementById('ordersContainer')){
+    renderOrdersTab();
+  }
+});
 </script>
 </body>
 </html>
