@@ -717,11 +717,16 @@ function showBids(cat, item) {
       <label for="bidSelect" class="small">Select a bid option</label>
       <select id="bidSelect" style="width:100%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #eee">
       </select>
+
+      <label for="reqDesc" class="small">Add description (optional)</label>
+      <textarea id="reqDesc" rows="3" placeholder="Type your description here..." 
+        style="width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid #eee"></textarea>
+
       <div style="margin-top:12px">
         <button id="sendRequest" class="btn primary">Send Request</button>
       </div>
     </div>
-  `;
+    `;
 
   $('#back').addEventListener('click', () => renderServiceDetail(cat));
 
@@ -759,10 +764,12 @@ function showBids(cat, item) {
       title: item.name,
       vendor: chosen.name,
       amount: chosen.price,
+      
+      notes: document.getElementById('reqDesc') ? document.getElementById('reqDesc').value : '',
       walletUsed: 0,
       status: 'Request Sent',
-      when: new Date().toLocaleString()
-    };
+      when: new Date().toLocaleString(),
+};
     orders.unshift(order);
     storage.saveOrders(orders);
 

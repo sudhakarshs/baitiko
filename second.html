@@ -661,7 +661,7 @@ function renderTasks(filter = 'all', containerId = 'tasksContainer'){
         <div class="task-ico">${t.title.split(' ').slice(0,1)}</div>
         <div class="task-meta">
           <div class="task-title">${t.title}</div>
-          <div class="task-sub">${t.location} • ${t.posted}</div>
+          <div class="task-sub">${t.location} </div>
           <div class="small-pill">${t.offers} offers • ${t.hours} hrs</div>
         </div>
       </div>
@@ -689,7 +689,8 @@ function openTaskDetail(id){
     <div class="kv"><strong>Hours</strong><div>${task.hours} hrs</div></div>
     <div class="kv"><strong>Offers</strong><div>${task.offers}</div></div>
     <div class="kv"><strong>Status</strong><div id="detailStatus">${task.status}</div></div>
-    <div style="margin-top:8px;color:var(--muted)">${task.notes}</div>
+    <div class="kv"><strong>Description</strong><div>${task.desc || '-'}</div></div>
+    <div style="margin-top:8px;color:var(--muted)">${task.desc || '-'}</div>
     <div style="margin-top:12px;display:flex;gap:8px">
       <button class="btn" id="completeBtn">${task.status==='completed'?'Completed':'Mark Completed'}</button>
     </div>
@@ -887,7 +888,7 @@ openTaskDetail = function(id){
       <div class="kv"><strong>Selected Option</strong><div>${ord.vendor || ''}</div></div>
       <div class="kv"><strong>Amount</strong><div>₹${ord.amount || 0}</div></div>
       <div class="kv"><strong>Status</strong><div id="detailStatus">${ord.status || 'requested'}</div></div>
-      <div style="margin-top:8px;color:var(--muted)">${ord.notes || ''}</div>
+      <div class="kv"><strong>Description</strong><div id="">${ord.notes || ''}</div></div>
       <div style="margin-top:12px"><strong>Bids</strong><div id="supplierBidsList" style="margin-top:8px"></div></div>
       <div style="margin-top:12px" id="placeBidBox">
         <h4>Place your bid</h4>
