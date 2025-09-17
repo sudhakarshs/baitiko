@@ -130,7 +130,7 @@
   .task-time{font-size:13px;color:var(--muted)}
   .small-pill{display:inline-block;padding:6px 8px;border-radius:8px;background:#f3f7fb;border:1px solid #edf4fb;font-size:12px;color:#334155;margin-top:8px}
   .detail-card{background:#fff;padding:16px;border-radius:12px;border:1px solid #eef2f7;box-shadow:var(--shadow)}
-  .kv{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin-bottom:8px}
+  .kv{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:center;margin-bottom:8px}
   .kv strong{color:#374151}
   .btn{display:inline-block;padding:10px 12px;border-radius:10px;border:1px solid #e6eef9;background:#fff;cursor:pointer}
   .btn.primary{background:var(--brand);color:#fff;border:0}
@@ -879,10 +879,10 @@ openTaskDetail = function(id){
     const host = $('#detailCard'); host.innerHTML = '';
     host.innerHTML = `
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-        <div style="width:64px;height:64;border-radius:10px;background:var(--glass);display:grid;place-items:center;font-weight:700;color:var(--brand)">${ord.title.split(' ')[0]}</div>
+        <div style="width:74px;height:44px;border-radius:10px;background:var(--glass);display:grid;place-items:center;font-weight:700;color:var(--brand)">${ord.title.split(' ')[0]}</div>
         <div>
           <div style="font-weight:800">${ord.title}</div>
-          <div class="muted">${ord.location || ''} • ${ord.posted || ''}</div>
+          
         </div>
       </div>
       <div class="kv"><strong>Selected Option</strong><div>${ord.vendor || ''}</div></div>
